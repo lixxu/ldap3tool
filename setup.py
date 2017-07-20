@@ -6,7 +6,7 @@ Simple wrapper for ldap3, used in Nypro & Jabil Shanghai internal
 from setuptools import setup
 
 setup(
-    name='ldap3',
+    name='ldaptool',
     version='0.1.0',
     url='http://10.116.168.15:81/lix/ldaptool',
     license='BSD',
