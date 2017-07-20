@@ -4,6 +4,10 @@
 import ldap3
 from ldap3 import Server, Connection, SUBTREE
 
+DEFAULT_ATTRIBUTES = ['manager', 'employeeNumber', 'employeeID', 'cn', 'name',
+                      'extensionAttribute14', 'displayName', 'sAMAccountName',
+                      'mail', 'title', 'department', 'telephoneNumber',
+                      'mobile']
 COMMON_FILTERS = dict(display='(displayName={})', name='(sAMAccountName={})',
                       email='(mail={})', phone='(telephoneNumber={})',
                       number='(employeeNumber={})', mobile='(mobile={})',
@@ -15,7 +19,7 @@ class LDAPTool(object):
         self.server = kwargs.get('server')
         self.base_dn = kwargs.get('base_dn')
         self.search_scope = kwargs.get('search_scope') or SUBTREE
-        self.retrive_attrs = kwargs.get('retrive_attrs', ldap3.ALL_ATTRIBUTES)
+        self.retrive_attrs = kwargs.get('retrive_attrs', DEFAULT_ATTRIBUTES)
         self.version = kwargs.get('version', 3)
 
     def connect(self, username, password, auto_bind=True):
@@ -51,7 +55,7 @@ class LDAPTool(object):
                     department=attrs.get('department', '').strip().upper(),
                     phone=attrs.get('telephoneNumber', '').strip().lower(),
                     mobile=attrs.get('mobile', '').strip().lower(),
-                    number=attrs.get('employeeNumber', '').strip(),
+                    number=number,
                     )
 
     def search_by(self, filter_value, **kwargs):
