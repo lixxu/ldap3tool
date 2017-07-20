@@ -60,13 +60,14 @@ class LDAPTool(object):
             limit = kwargs.pop('paged_size')
 
         as_raw = kwargs.pop('as_raw', False)
-        self.conn.search(search_base=self.base_dn,
-                         search_filter=filter_value,
-                         search_scope=self.search_scope,
-                         attributes=self.retrive_attrs,
-                         paged_size=limit, **kwargs)
+        conn = kwargs.pop('conn', self.conn)
+        conn.search(search_base=self.base_dn,
+                    search_filter=filter_value,
+                    search_scope=self.search_scope,
+                    attributes=self.retrive_attrs,
+                    paged_size=limit, **kwargs)
         results = []
-        for entry in self.conn.response:
+        for entry in conn.response:
             if 'attributes' in entry:
                 if as_raw:
                     results.append(entry['attributes'])
