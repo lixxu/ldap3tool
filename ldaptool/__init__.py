@@ -7,11 +7,33 @@ from ldap3 import Server, Connection, SUBTREE
 DEFAULT_ATTRIBUTES = ['manager', 'employeeNumber', 'employeeID', 'cn', 'name',
                       'extensionAttribute14', 'displayName', 'sAMAccountName',
                       'mail', 'title', 'department', 'telephoneNumber',
-                      'mobile']
+                      'mobile', 'directReports']
+NAME_MAPS = dict(display='displayName', name='sAMAccountName',
+                 email='mail', mail='mail', phone='telephoneNumber',
+                 number='employeeNumber', mobile='mobile',
+                 )
 COMMON_FILTERS = dict(display='(displayName={})', name='(sAMAccountName={})',
                       email='(mail={})', phone='(telephoneNumber={})',
                       number='(employeeNumber={})', mobile='(mobile={})',
                       )
+
+
+def get_operators(maps, op='|'):
+    ops = ['({}'.format(op)]
+    if isinstance(maps, dict):
+        items = maps.items()
+    else:
+        items = maps
+
+    for k, v in items:
+        k = NAME_MAPS.get(k, k)
+        if isinstance(v, (list, tuple)):
+            ops.extend(['({}={})'.format(k, v_) for v_ in v])
+        else:
+            ops.append('({}={})'.format(k, v))
+
+    ops.append(')')
+    return ''.join(ops)
 
 
 class LDAPTool(object):
@@ -46,6 +68,13 @@ class LDAPTool(object):
         if not full_name:
             full_name = alias_name or name or cn
 
+        reports = attrs.get('directReports') or []
+        reports_to = [r.split(',', 1)[0].split('=')[-1].strip()
+                      for r in reports]
+        mobile = attrs.get('mobile') or ''
+        if isinstance(mobile, []):
+            mobile = ', '.join(m.strip().lower() for m in mobile)
+
         return dict(ntname=attrs['sAMAccountName'].strip().lower(),
                     full_name=full_name,
                     alias_name=alias_name,
@@ -54,8 +83,9 @@ class LDAPTool(object):
                     title=attrs.get('title', '').strip().upper(),
                     department=attrs.get('department', '').strip().upper(),
                     phone=attrs.get('telephoneNumber', '').strip().lower(),
-                    mobile=attrs.get('mobile', '').strip().lower(),
+                    mobile=mobile,
                     number=number,
+                    reports_to=reports_to,
                     )
 
     def search_by(self, filter_value, **kwargs):
