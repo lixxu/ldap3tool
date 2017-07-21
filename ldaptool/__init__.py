@@ -72,7 +72,7 @@ class LDAPTool(object):
         reports_to = [r.split(',', 1)[0].split('=')[-1].strip()
                       for r in reports]
         mobile = attrs.get('mobile') or ''
-        if isinstance(mobile, []):
+        if isinstance(mobile, list):
             mobile = ', '.join(m.strip().lower() for m in mobile)
 
         return dict(ntname=attrs['sAMAccountName'].strip().lower(),
