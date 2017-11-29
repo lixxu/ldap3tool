@@ -7,8 +7,8 @@ from setuptools import setup
 
 setup(
     name='ldaptool',
-    version='0.2.0',
-    url='http://10.116.168.15:81/lix/ldaptool',
+    version='0.3.0',
+    url='http://shatehq:81/lix/ldaptool',
     license='BSD',
     author='Lix Xu',
     author_email='lix_xu@jabil.com',

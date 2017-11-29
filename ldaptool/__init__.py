@@ -43,6 +43,7 @@ class LDAPTool(object):
         self.search_scope = kwargs.get('search_scope') or SUBTREE
         self.retrive_attrs = kwargs.get('retrive_attrs', DEFAULT_ATTRIBUTES)
         self.version = kwargs.get('version', 3)
+        self.conn = None
 
     def connect(self, username, password, auto_bind=True):
         self.conn = Connection(self.server, user=username, password=password,
@@ -52,16 +53,19 @@ class LDAPTool(object):
     def close(self):
         self.conn.unbind()
 
-    def parse_info(self, attrs={}):
-        manager = attrs.get('manager', '').strip().split(',', 1)[0]
-        number = attrs.get('employeeNumber', '').strip()
-        if not number:
-            number = attrs.get('employeeID', '').strip()
+    def parse_info(self, attrs=None):
+        if not attrs:
+            attrs = {}
 
-        alias_name = attrs.get('extensionAttribute14', '').strip()
-        full_name = attrs.get('displayName', '').strip()
-        cn = attrs.get('cn', '').strip()
-        name = attrs.get('name', '').strip()
+        manager = (attrs.get('manager') or '').strip().split(',', 1)[0]
+        number = (attrs.get('employeeNumber') or '').strip()
+        if not number:
+            number = (attrs.get('employeeID') or '').strip()
+
+        alias_name = (attrs.get('extensionAttribute14') or '').strip()
+        full_name = (attrs.get('displayName') or '').strip()
+        cn = (attrs.get('cn') or '').strip()
+        name = (attrs.get('name') or '').strip()
         if not alias_name:
             alias_name = full_name or cn or name
 
@@ -78,11 +82,11 @@ class LDAPTool(object):
         return dict(ntname=attrs['sAMAccountName'].strip().lower(),
                     full_name=full_name,
                     alias_name=alias_name,
-                    email=attrs.get('mail', '').strip().lower(),
+                    email=(attrs.get('mail') or '').strip().lower(),
                     manager=manager.split('=')[-1].strip(),
-                    title=attrs.get('title', '').strip().upper(),
-                    department=attrs.get('department', '').strip().upper(),
-                    phone=attrs.get('telephoneNumber', '').strip().lower(),
+                    title=(attrs.get('title') or '').strip().upper(),
+                    department=(attrs.get('department') or '').strip().upper(),
+                    phone=(attrs.get('telephoneNumber') or '').strip().lower(),
                     mobile=mobile,
                     number=number,
                     reports_to=reports_to,
