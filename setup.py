@@ -1,20 +1,20 @@
 """
-ldaptool
+ldap3tool
 --------------
-Simple wrapper for ldap3, used in Nypro & Jabil Shanghai internal
+Simple wrapper for ldap3
 """
 from setuptools import setup
 
 setup(
-    name='ldaptool',
-    version='0.3.0',
-    url='http://shatehq:81/lix/ldaptool',
+    name='ldap3tool',
+    version='0.4.0',
+    url='https://github.com/lixxu/ldap3tool',
     license='BSD',
     author='Lix Xu',
-    author_email='lix_xu@jabil.com',
+    author_email='xuzenglin@gmail.com',
     description='Simple wrapper for ldap3',
     long_description=__doc__,
-    packages=['ldaptool'],
+    packages=['ldap3tool'],
     zip_safe=False,
     platforms='any',
     install_requires=['ldap3'],
