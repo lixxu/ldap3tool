@@ -4,6 +4,8 @@
 import ldap3
 from ldap3 import Server, Connection, SUBTREE
 
+__version__ = '0.4.1'
+
 DEFAULT_ATTRIBUTES = ['manager', 'employeeNumber', 'employeeID', 'cn', 'name',
                       'extensionAttribute14', 'displayName', 'sAMAccountName',
                       'mail', 'title', 'department', 'telephoneNumber',
@@ -19,12 +21,12 @@ COMMON_FILTERS = dict(display='(displayName={})', name='(sAMAccountName={})',
 
 
 def get_operators(maps, op='|'):
-    ops = ['({}'.format(op)]
     if isinstance(maps, dict):
         items = maps.items()
     else:
         items = maps
 
+    ops = []
     for k, v in items:
         k = NAME_MAPS.get(k, k)
         if isinstance(v, (list, tuple)):
@@ -32,7 +34,10 @@ def get_operators(maps, op='|'):
         else:
             ops.append('({}={})'.format(k, v))
 
-    ops.append(')')
+    if len(ops) > 1:
+        ops.insert(0, '({}'.format(op))
+        ops.append(')')
+
     return ''.join(ops)
 
 
